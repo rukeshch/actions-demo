@@ -1,0 +1,44 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build-and-test:
+    name: Build and Test Python Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set Up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+
+      - name: Check Python Syntax
+        run: python -m py_compile calculator.py
+
+      - name: Run Unit Tests
+        run: |
+          if [ -f test_calculator.py ]; then
+            python -m unittest test_calculator -v
+          else
+            echo "Error: test_calculator.py not found"
+            exit 1
+          fi
